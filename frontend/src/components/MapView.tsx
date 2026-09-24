@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import * as maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import { fakeListings } from '../data/fakeListings'
+import { fakeListings, type ListingProperties } from '../data/fakeListings'
 import { CATEGORY_COLORS } from '../data/categoryStyles'
 
 const TORONTO_CENTER: [number, number] = [-79.3832, 43.6532]
@@ -55,6 +55,66 @@ export function MapView() {
           'circle-stroke-width': 2,
           'circle-stroke-color': '#ffffff',
         },
+      })
+
+      const hoverPopup = new maplibregl.Popup({
+        closeButton: false,
+        closeOnClick: false,
+        offset: 12,
+      })
+
+      let openClickPopup: maplibregl.Popup | null = null
+      let openClickPopupId: string | null = null
+
+      map.on('mouseenter', 'listings-markers', (e) => {
+        map.getCanvas().style.cursor = 'pointer'
+        const feature = e.features?.[0]
+        if (!feature || feature.geometry.type !== 'Point') return
+
+        const { id, name } = feature.properties as ListingProperties
+        if (id === openClickPopupId) return
+
+        const coordinates = feature.geometry.coordinates.slice() as [number, number]
+        hoverPopup.setLngLat(coordinates).setText(name).addTo(map)
+      })
+
+      map.on('mouseleave', 'listings-markers', () => {
+        map.getCanvas().style.cursor = ''
+        hoverPopup.remove()
+      })
+
+      map.on('click', 'listings-markers', (e) => {
+        const feature = e.features?.[0]
+        if (!feature || feature.geometry.type !== 'Point') return
+
+        hoverPopup.remove()
+        openClickPopup?.remove()
+
+        const coordinates = feature.geometry.coordinates.slice() as [number, number]
+        const { id, name, description } = feature.properties as ListingProperties
+
+        const container = document.createElement('div')
+
+        const title = document.createElement('h3')
+        title.textContent = name
+        title.style.margin = '0 0 6px'
+        title.style.fontSize = '15px'
+
+        const body = document.createElement('p')
+        body.textContent = description
+        body.style.margin = '0'
+        body.style.fontSize = '13px'
+
+        container.append(title, body)
+
+        const popup = new maplibregl.Popup({ offset: 12 }).setLngLat(coordinates).setDOMContent(container).addTo(map)
+
+        popup.on('close', () => {
+          if (openClickPopupId === id) openClickPopupId = null
+        })
+
+        openClickPopup = popup
+        openClickPopupId = id
       })
     })
 

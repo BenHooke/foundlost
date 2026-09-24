@@ -4,6 +4,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.db import get_db
+from app.routers import found_items, lost_items
 
 app = FastAPI(title="FoundLost API")
 
@@ -13,6 +14,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(lost_items.router)
+app.include_router(found_items.router)
 
 
 @app.get("/health")
