@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react'
 import * as maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import { fakeListings, type ListingProperties } from '../data/fakeListings'
+import { fetchListings } from '../api/listings'
+import type { ListingProperties } from '../types/listing'
 import { CATEGORY_COLORS } from '../data/categoryStyles'
 
 const TORONTO_CENTER: [number, number] = [-79.3832, 43.6532]
@@ -28,7 +29,7 @@ export function MapView() {
     map.on('load', () => {
       map.addSource(LISTINGS_SOURCE_ID, {
         type: 'geojson',
-        data: fakeListings,
+        data: { type: 'FeatureCollection', features: [] },
       })
 
       map.addLayer({
@@ -116,6 +117,15 @@ export function MapView() {
         openClickPopup = popup
         openClickPopupId = id
       })
+
+      fetchListings()
+        .then((data) => {
+          const source = map.getSource(LISTINGS_SOURCE_ID) as maplibregl.GeoJSONSource
+          source.setData(data)
+        })
+        .catch((error: unknown) => {
+          console.error('Failed to load listings', error)
+        })
     })
 
     return () => {

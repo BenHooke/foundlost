@@ -1,4 +1,4 @@
-import type { ListingCategory } from './fakeListings'
+import type { ListingCategory } from '../types/listing'
 
 export const CATEGORY_COLORS: Record<ListingCategory, string> = {
   bag: '#e67e22',

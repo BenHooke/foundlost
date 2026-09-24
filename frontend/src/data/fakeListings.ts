@@ -1,16 +1,5 @@
 import type { FeatureCollection, Point } from 'geojson'
-
-export type ListingType = 'lost' | 'found'
-
-export type ListingCategory = 'bag' | 'pet' | 'wallet' | 'keys' | 'electronics' | 'other'
-
-export interface ListingProperties {
-  id: string
-  name: string
-  description: string
-  type: ListingType
-  category: ListingCategory
-}
+import type { ListingProperties } from '../types/listing'
 
 export const fakeListings: FeatureCollection<Point, ListingProperties> = {
   type: 'FeatureCollection',
