@@ -43,10 +43,16 @@ export function MapView() {
             ['get', 'category'],
             'bag',
             CATEGORY_COLORS.bag,
+            'clothes',
+            CATEGORY_COLORS.clothes,
+            'accessory',
+            CATEGORY_COLORS.accessory,
             'pet',
             CATEGORY_COLORS.pet,
             'wallet',
             CATEGORY_COLORS.wallet,
+            'card',
+            CATEGORY_COLORS.card,
             'keys',
             CATEGORY_COLORS.keys,
             'electronics',
@@ -133,5 +139,5 @@ export function MapView() {
     }
   }, [])
 
-  return <div ref={containerRef} style={{ width: '100vw', height: '100vh' }} />
+  return <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
 }

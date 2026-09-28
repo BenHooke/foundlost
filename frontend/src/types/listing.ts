@@ -1,6 +1,15 @@
 export type ListingType = 'lost' | 'found'
 
-export type ListingCategory = 'bag' | 'pet' | 'wallet' | 'keys' | 'electronics' | 'other'
+export type ListingCategory =
+  | 'bag'
+  | 'clothes'
+  | 'accessory'
+  | 'pet'
+  | 'wallet'
+  | 'card'
+  | 'keys'
+  | 'electronics'
+  | 'other'
 
 export interface ListingProperties {
   id: string

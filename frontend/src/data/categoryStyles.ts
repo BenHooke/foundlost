@@ -2,8 +2,11 @@ import type { ListingCategory } from '../types/listing'
 
 export const CATEGORY_COLORS: Record<ListingCategory, string> = {
   bag: '#e67e22',
+  clothes: '#c0392b',
+  accessory: '#e84393',
   pet: '#8e44ad',
   wallet: '#f1c40f',
+  card: '#27ae60',
   keys: '#16a085',
   electronics: '#2980b9',
   other: '#7f8c8d',
