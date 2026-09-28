@@ -7,6 +7,7 @@ interface LostItemRead {
   name: string
   description: string
   category: ListingCategory
+  contact_info: string
   last_had_location: Point
 }
 
@@ -15,6 +16,7 @@ interface FoundItemRead {
   name: string
   description: string
   category: ListingCategory
+  contact_info: string
   found_location: Point
 }
 
@@ -38,6 +40,7 @@ export async function fetchListings(): Promise<FeatureCollection<Point, ListingP
       id: `lost-${item.id}`,
       name: item.name,
       description: item.description,
+      contactInfo: item.contact_info,
       type: 'lost',
       category: item.category,
     },
@@ -50,6 +53,7 @@ export async function fetchListings(): Promise<FeatureCollection<Point, ListingP
       id: `found-${item.id}`,
       name: item.name,
       description: item.description,
+      contactInfo: item.contact_info,
       type: 'found',
       category: item.category,
     },
@@ -67,7 +71,6 @@ export interface LostItemCreatePayload {
   description: string
   contact_info: string
   last_had_location: Point
-  realized_location: Point
 }
 
 export interface FoundItemCreatePayload {

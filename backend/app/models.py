@@ -35,7 +35,7 @@ class LostItem(Base):
         Geometry(geometry_type="POINT", srid=4326, spatial_index=False)
     )
     realized_location = mapped_column(
-        Geometry(geometry_type="POINT", srid=4326, spatial_index=False)
+        Geometry(geometry_type="POINT", srid=4326, spatial_index=False), nullable=True
     )
     search_area = mapped_column(
         Geometry(geometry_type="POLYGON", srid=4326, spatial_index=False), nullable=True

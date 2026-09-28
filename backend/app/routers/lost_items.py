@@ -19,7 +19,7 @@ def _to_read(item: LostItem) -> LostItemRead:
         description=item.description,
         contact_info=item.contact_info,
         last_had_location=point_from_wkb(item.last_had_location),
-        realized_location=point_from_wkb(item.realized_location),
+        realized_location=point_from_wkb(item.realized_location) if item.realized_location is not None else None,
         search_area=polygon_from_wkb(item.search_area) if item.search_area is not None else None,
         time_lost=item.time_lost,
         time_posted=item.time_posted,
@@ -35,7 +35,7 @@ def create_lost_item(payload: LostItemCreate, db: Session = Depends(get_db)) -> 
         description=payload.description,
         contact_info=payload.contact_info,
         last_had_location=to_wkb(payload.last_had_location),
-        realized_location=to_wkb(payload.realized_location),
+        realized_location=to_wkb(payload.realized_location) if payload.realized_location is not None else None,
         search_area=to_wkb(payload.search_area) if payload.search_area is not None else None,
         time_lost=payload.time_lost or datetime.now(timezone.utc),
     )

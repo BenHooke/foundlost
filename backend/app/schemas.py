@@ -12,7 +12,7 @@ class LostItemCreate(BaseModel):
     description: str
     contact_info: str
     last_had_location: Point
-    realized_location: Point
+    realized_location: Point | None = None
     search_area: Polygon | None = None
     time_lost: datetime | None = None
 
@@ -24,7 +24,7 @@ class LostItemRead(BaseModel):
     description: str
     contact_info: str
     last_had_location: Point
-    realized_location: Point
+    realized_location: Point | None
     search_area: Polygon | None
     time_lost: datetime
     time_posted: datetime

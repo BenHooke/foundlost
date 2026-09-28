@@ -112,7 +112,7 @@ export function MapView({ onMapClick, pendingPins, refreshToken }: MapViewProps)
         openClickPopup?.remove()
 
         const coordinates = feature.geometry.coordinates.slice() as [number, number]
-        const { id, name, description } = feature.properties as ListingProperties
+        const { id, name, description, contactInfo } = feature.properties as ListingProperties
 
         const container = document.createElement('div')
 
@@ -123,10 +123,16 @@ export function MapView({ onMapClick, pendingPins, refreshToken }: MapViewProps)
 
         const body = document.createElement('p')
         body.textContent = description
-        body.style.margin = '0'
+        body.style.margin = '0 0 6px'
         body.style.fontSize = '13px'
 
-        container.append(title, body)
+        const contact = document.createElement('p')
+        contact.textContent = `Contact: ${contactInfo}`
+        contact.style.margin = '0'
+        contact.style.fontSize = '13px'
+        contact.style.fontWeight = '600'
+
+        container.append(title, body, contact)
 
         const popup = new maplibregl.Popup({ offset: 12 }).setLngLat(coordinates).setDOMContent(container).addTo(map)
 

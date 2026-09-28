@@ -3,21 +3,20 @@ import { ApiStatus } from './components/ApiStatus'
 import { Header } from './components/Header'
 import { MapView } from './components/MapView'
 import { NewPostForm } from './components/NewPostForm'
-import { CATEGORY_COLORS } from './data/categoryStyles'
 import type { ListingType } from './types/listing'
 
-const PIN_COLORS = ['#d32f2f', '#333333']
+const PIN_COLOR = '#d32f2f'
+const PINS_NEEDED = 1
 
 function App() {
   const [postType, setPostType] = useState<ListingType | null>(null)
   const [pins, setPins] = useState<[number, number][]>([])
   const [refreshToken, setRefreshToken] = useState(0)
 
-  const pinsNeeded = postType === 'lost' ? 2 : postType === 'found' ? 1 : 0
   const isCreating = postType !== null
 
   const handleMapClick =
-    isCreating && pins.length < pinsNeeded
+    isCreating && pins.length < PINS_NEEDED
       ? (lngLat: [number, number]) => setPins((prev) => [...prev, lngLat])
       : undefined
 
@@ -39,14 +38,14 @@ function App() {
         <ApiStatus />
         <MapView
           onMapClick={handleMapClick}
-          pendingPins={pins.map((lngLat, i) => ({ lngLat, color: PIN_COLORS[i] ?? CATEGORY_COLORS.other }))}
+          pendingPins={pins.map((lngLat) => ({ lngLat, color: PIN_COLOR }))}
           refreshToken={refreshToken}
         />
         {postType && (
           <NewPostForm
             type={postType}
             pins={pins}
-            pinsNeeded={pinsNeeded}
+            pinsNeeded={PINS_NEEDED}
             onCancel={resetPostFlow}
             onSubmitted={() => {
               resetPostFlow()

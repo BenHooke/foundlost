@@ -15,6 +15,7 @@ export interface ListingProperties {
   id: string
   name: string
   description: string
+  contactInfo: string
   type: ListingType
   category: ListingCategory
 }

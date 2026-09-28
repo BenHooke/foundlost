@@ -13,10 +13,7 @@ interface NewPostFormProps {
 
 const PIN_INSTRUCTIONS: Record<ListingType, string[]> = {
   found: ['Click the map to drop a pin where you found it.'],
-  lost: [
-    'Click the map to drop a pin where you last had it.',
-    'Now click again for where you realized it was missing.',
-  ],
+  lost: ['Click the map to drop a pin where you lost it.'],
 }
 
 export function NewPostForm({ type, pins, pinsNeeded, onCancel, onSubmitted }: NewPostFormProps) {
@@ -46,7 +43,6 @@ export function NewPostForm({ type, pins, pinsNeeded, onCancel, onSubmitted }: N
           description,
           contact_info: contactInfo,
           last_had_location: { type: 'Point', coordinates: pins[0] },
-          realized_location: { type: 'Point', coordinates: pins[1] },
         })
       } else {
         await createFoundItem({
