@@ -17,11 +17,13 @@ def _to_read(item: LostItem) -> LostItemRead:
         name=item.name,
         category=item.category,
         description=item.description,
+        contact_info=item.contact_info,
         last_had_location=point_from_wkb(item.last_had_location),
         realized_location=point_from_wkb(item.realized_location),
-        search_area=polygon_from_wkb(item.search_area),
+        search_area=polygon_from_wkb(item.search_area) if item.search_area is not None else None,
         time_lost=item.time_lost,
         time_posted=item.time_posted,
+        expires_at=item.expires_at,
     )
 
 
@@ -31,9 +33,10 @@ def create_lost_item(payload: LostItemCreate, db: Session = Depends(get_db)) -> 
         name=payload.name,
         category=payload.category,
         description=payload.description,
+        contact_info=payload.contact_info,
         last_had_location=to_wkb(payload.last_had_location),
         realized_location=to_wkb(payload.realized_location),
-        search_area=to_wkb(payload.search_area),
+        search_area=to_wkb(payload.search_area) if payload.search_area is not None else None,
         time_lost=payload.time_lost or datetime.now(timezone.utc),
     )
     db.add(item)
@@ -44,7 +47,12 @@ def create_lost_item(payload: LostItemCreate, db: Session = Depends(get_db)) -> 
 
 @router.get("", response_model=list[LostItemRead])
 def list_lost_items(db: Session = Depends(get_db)) -> list[LostItemRead]:
-    items = db.query(LostItem).order_by(LostItem.time_posted.desc()).all()
+    items = (
+        db.query(LostItem)
+        .filter(LostItem.expires_at > datetime.now(timezone.utc))
+        .order_by(LostItem.time_posted.desc())
+        .all()
+    )
     return [_to_read(item) for item in items]
 
 

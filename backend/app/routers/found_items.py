@@ -17,9 +17,11 @@ def _to_read(item: FoundItem) -> FoundItemRead:
         name=item.name,
         category=item.category,
         description=item.description,
+        contact_info=item.contact_info,
         found_location=point_from_wkb(item.found_location),
         time_found=item.time_found,
         time_posted=item.time_posted,
+        expires_at=item.expires_at,
     )
 
 
@@ -29,6 +31,7 @@ def create_found_item(payload: FoundItemCreate, db: Session = Depends(get_db)) -
         name=payload.name,
         category=payload.category,
         description=payload.description,
+        contact_info=payload.contact_info,
         found_location=to_wkb(payload.found_location),
         time_found=payload.time_found or datetime.now(timezone.utc),
     )
@@ -40,7 +43,12 @@ def create_found_item(payload: FoundItemCreate, db: Session = Depends(get_db)) -
 
 @router.get("", response_model=list[FoundItemRead])
 def list_found_items(db: Session = Depends(get_db)) -> list[FoundItemRead]:
-    items = db.query(FoundItem).order_by(FoundItem.time_posted.desc()).all()
+    items = (
+        db.query(FoundItem)
+        .filter(FoundItem.expires_at > datetime.now(timezone.utc))
+        .order_by(FoundItem.time_posted.desc())
+        .all()
+    )
     return [_to_read(item) for item in items]
 
 

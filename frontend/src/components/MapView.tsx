@@ -9,8 +9,21 @@ const TORONTO_CENTER: [number, number] = [-79.3832, 43.6532]
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/liberty'
 const LISTINGS_SOURCE_ID = 'listings'
 
-export function MapView() {
+export interface PendingPin {
+  lngLat: [number, number]
+  color: string
+}
+
+interface MapViewProps {
+  onMapClick?: (lngLat: [number, number]) => void
+  pendingPins?: PendingPin[]
+  refreshToken?: number
+}
+
+export function MapView({ onMapClick, pendingPins, refreshToken }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const mapRef = useRef<maplibregl.Map | null>(null)
+  const pendingMarkersRef = useRef<maplibregl.Marker[]>([])
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -21,6 +34,7 @@ export function MapView() {
       center: TORONTO_CENTER,
       zoom: 11,
     })
+    mapRef.current = map
 
     map.addControl(new maplibregl.NavigationControl())
     map.addControl(new maplibregl.GeolocateControl({}))
@@ -136,8 +150,52 @@ export function MapView() {
 
     return () => {
       map.remove()
+      mapRef.current = null
     }
   }, [])
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !onMapClick) return
+
+    const handleClick = (e: maplibregl.MapMouseEvent) => {
+      onMapClick([e.lngLat.lng, e.lngLat.lat])
+    }
+
+    map.on('click', handleClick)
+    return () => {
+      map.off('click', handleClick)
+    }
+  }, [onMapClick])
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map) return
+
+    pendingMarkersRef.current.forEach((marker) => marker.remove())
+    pendingMarkersRef.current = (pendingPins ?? []).map(({ lngLat, color }) =>
+      new maplibregl.Marker({ color }).setLngLat(lngLat).addTo(map),
+    )
+
+    return () => {
+      pendingMarkersRef.current.forEach((marker) => marker.remove())
+      pendingMarkersRef.current = []
+    }
+  }, [pendingPins])
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || refreshToken === undefined) return
+
+    const source = map.getSource(LISTINGS_SOURCE_ID) as maplibregl.GeoJSONSource | undefined
+    if (!source) return
+
+    fetchListings()
+      .then((data) => source.setData(data))
+      .catch((error: unknown) => {
+        console.error('Failed to load listings', error)
+      })
+  }, [refreshToken])
 
   return <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
 }

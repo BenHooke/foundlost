@@ -10,9 +10,10 @@ class LostItemCreate(BaseModel):
     name: str
     category: ItemCategory
     description: str
+    contact_info: str
     last_had_location: Point
     realized_location: Point
-    search_area: Polygon
+    search_area: Polygon | None = None
     time_lost: datetime | None = None
 
 
@@ -21,17 +22,20 @@ class LostItemRead(BaseModel):
     name: str
     category: ItemCategory
     description: str
+    contact_info: str
     last_had_location: Point
     realized_location: Point
-    search_area: Polygon
+    search_area: Polygon | None
     time_lost: datetime
     time_posted: datetime
+    expires_at: datetime
 
 
 class FoundItemCreate(BaseModel):
     name: str
     category: ItemCategory
     description: str
+    contact_info: str
     found_location: Point
     time_found: datetime | None = None
 
@@ -41,6 +45,8 @@ class FoundItemRead(BaseModel):
     name: str
     category: ItemCategory
     description: str
+    contact_info: str
     found_location: Point
     time_found: datetime
     time_posted: datetime
+    expires_at: datetime

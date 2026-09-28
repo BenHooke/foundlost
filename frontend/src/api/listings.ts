@@ -60,3 +60,44 @@ export async function fetchListings(): Promise<FeatureCollection<Point, ListingP
     features: [...lostFeatures, ...foundFeatures],
   }
 }
+
+export interface LostItemCreatePayload {
+  name: string
+  category: ListingCategory
+  description: string
+  contact_info: string
+  last_had_location: Point
+  realized_location: Point
+}
+
+export interface FoundItemCreatePayload {
+  name: string
+  category: ListingCategory
+  description: string
+  contact_info: string
+  found_location: Point
+}
+
+async function postJson(path: string, payload: unknown): Promise<void> {
+  const res = await fetch(`${API_URL}${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => null)
+    const message = Array.isArray(body?.detail)
+      ? body.detail.map((d: { msg: string }) => d.msg).join(', ')
+      : (body?.detail ?? 'Failed to submit post')
+    throw new Error(message)
+  }
+}
+
+export function createLostItem(payload: LostItemCreatePayload): Promise<void> {
+  return postJson('/lost-items', payload)
+}
+
+export function createFoundItem(payload: FoundItemCreatePayload): Promise<void> {
+  return postJson('/found-items', payload)
+}
