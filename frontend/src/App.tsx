@@ -1,8 +1,11 @@
 import { useState } from 'react'
 import { ApiStatus } from './components/ApiStatus'
+import { FilterBar, type TypeFilter } from './components/FilterBar'
 import { Header } from './components/Header'
+import { Legend } from './components/Legend'
 import { MapView } from './components/MapView'
 import { NewPostForm } from './components/NewPostForm'
+import { ReportFab } from './components/ReportFab'
 import type { ListingType } from './types/listing'
 
 const PIN_COLOR = '#d32f2f'
@@ -12,6 +15,7 @@ function App() {
   const [postType, setPostType] = useState<ListingType | null>(null)
   const [pins, setPins] = useState<[number, number][]>([])
   const [refreshToken, setRefreshToken] = useState(0)
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
 
   const isCreating = postType !== null
 
@@ -27,19 +31,23 @@ function App() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', width: '100vw', height: '100vh' }}>
-      <Header
-        disabled={isCreating}
-        onSelectPostType={(type) => {
-          setPostType(type)
-          setPins([])
-        }}
-      />
+      <Header />
       <div style={{ position: 'relative', flex: 1, minHeight: 0 }}>
         <ApiStatus />
         <MapView
           onMapClick={handleMapClick}
           pendingPins={pins.map((lngLat) => ({ lngLat, color: PIN_COLOR }))}
           refreshToken={refreshToken}
+          typeFilter={typeFilter}
+        />
+        <FilterBar value={typeFilter} onChange={setTypeFilter} />
+        <Legend />
+        <ReportFab
+          disabled={isCreating}
+          onSelectPostType={(type) => {
+            setPostType(type)
+            setPins([])
+          }}
         />
         {postType && (
           <NewPostForm

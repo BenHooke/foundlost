@@ -8,3 +8,8 @@ body,
 body {
   font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
 }
+
+/* Drop the white ring around the user-location dot so it reads as distinct from lost/found pins. */
+.maplibregl-user-location-dot::after {
+  display: none !important;
+}

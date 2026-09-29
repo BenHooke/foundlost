@@ -4,10 +4,12 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import { fetchListings } from '../api/listings'
 import type { ListingProperties } from '../types/listing'
 import { CATEGORY_COLORS } from '../data/categoryStyles'
+import type { TypeFilter } from './FilterBar'
 
 const TORONTO_CENTER: [number, number] = [-79.3832, 43.6532]
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/liberty'
 const LISTINGS_SOURCE_ID = 'listings'
+const LISTINGS_LAYER_ID = 'listings-markers'
 
 export interface PendingPin {
   lngLat: [number, number]
@@ -18,9 +20,10 @@ interface MapViewProps {
   onMapClick?: (lngLat: [number, number]) => void
   pendingPins?: PendingPin[]
   refreshToken?: number
+  typeFilter?: TypeFilter
 }
 
-export function MapView({ onMapClick, pendingPins, refreshToken }: MapViewProps) {
+export function MapView({ onMapClick, pendingPins, refreshToken, typeFilter = 'all' }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
   const pendingMarkersRef = useRef<maplibregl.Marker[]>([])
@@ -33,12 +36,13 @@ export function MapView({ onMapClick, pendingPins, refreshToken }: MapViewProps)
       style: MAP_STYLE,
       center: TORONTO_CENTER,
       zoom: 11,
+      attributionControl: false,
     })
     mapRef.current = map
 
+    map.addControl(new maplibregl.AttributionControl({ compact: true }))
     map.addControl(new maplibregl.NavigationControl())
     map.addControl(new maplibregl.GeolocateControl({}))
-    map.addControl(new maplibregl.ScaleControl(), 'bottom-left')
 
     map.on('load', () => {
       map.addSource(LISTINGS_SOURCE_ID, {
@@ -74,7 +78,7 @@ export function MapView({ onMapClick, pendingPins, refreshToken }: MapViewProps)
             CATEGORY_COLORS.other,
           ],
           'circle-stroke-width': 2,
-          'circle-stroke-color': '#ffffff',
+          'circle-stroke-color': ['match', ['get', 'type'], 'found', '#000000', '#ffffff'],
         },
       })
 
@@ -202,6 +206,22 @@ export function MapView({ onMapClick, pendingPins, refreshToken }: MapViewProps)
         console.error('Failed to load listings', error)
       })
   }, [refreshToken])
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map) return
+
+    const applyFilter = () => {
+      if (!map.getLayer(LISTINGS_LAYER_ID)) return
+      map.setFilter(LISTINGS_LAYER_ID, typeFilter === 'all' ? null : ['==', ['get', 'type'], typeFilter])
+    }
+
+    if (map.isStyleLoaded()) {
+      applyFilter()
+    } else {
+      map.once('load', applyFilter)
+    }
+  }, [typeFilter])
 
   return <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
 }
