@@ -31,7 +31,7 @@ export function ReportFab({ onSelectPostType, disabled }: ReportFabProps) {
             style={{
               background: '#ffffff',
               color: '#d32f2f',
-              border: 'none',
+              border: '2px solid #000000',
               borderRadius: 999,
               padding: '10px 20px',
               fontSize: 14,
@@ -48,7 +48,7 @@ export function ReportFab({ onSelectPostType, disabled }: ReportFabProps) {
             style={{
               background: '#ffffff',
               color: '#d32f2f',
-              border: 'none',
+              border: '2px solid #000000',
               borderRadius: 999,
               padding: '10px 20px',
               fontSize: 14,

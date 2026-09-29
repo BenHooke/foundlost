@@ -17,7 +17,7 @@ export function Header() {
         borderBottomRightRadius: 14,
       }}
     >
-      <span style={{ fontSize: 20, fontWeight: 700 }}>FoundLost</span>
+      <span style={{ fontSize: 30, fontWeight: 900, fontStyle: 'italic' }}>FoundLost</span>
     </header>
   )
 }
