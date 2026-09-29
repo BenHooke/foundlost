@@ -2,14 +2,15 @@ import { useEffect, useRef } from 'react'
 import * as maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { fetchListings } from '../api/listings'
-import type { ListingProperties } from '../types/listing'
-import { CATEGORY_COLORS } from '../data/categoryStyles'
+import type { ListingCategory, ListingProperties } from '../types/listing'
+import { CATEGORY_COLORS, CATEGORY_OPTIONS } from '../data/categoryStyles'
 import type { TypeFilter } from './FilterBar'
 
 const TORONTO_CENTER: [number, number] = [-79.3832, 43.6532]
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/liberty'
 const LISTINGS_SOURCE_ID = 'listings'
 const LISTINGS_LAYER_ID = 'listings-markers'
+const ALL_CATEGORIES = CATEGORY_OPTIONS.map((option) => option.value)
 
 export interface PendingPin {
   lngLat: [number, number]
@@ -21,9 +22,16 @@ interface MapViewProps {
   pendingPins?: PendingPin[]
   refreshToken?: number
   typeFilter?: TypeFilter
+  categoryFilter?: ListingCategory[]
 }
 
-export function MapView({ onMapClick, pendingPins, refreshToken, typeFilter = 'all' }: MapViewProps) {
+export function MapView({
+  onMapClick,
+  pendingPins,
+  refreshToken,
+  typeFilter = 'all',
+  categoryFilter = ALL_CATEGORIES,
+}: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
   const pendingMarkersRef = useRef<maplibregl.Marker[]>([])
@@ -213,7 +221,17 @@ export function MapView({ onMapClick, pendingPins, refreshToken, typeFilter = 'a
 
     const applyFilter = () => {
       if (!map.getLayer(LISTINGS_LAYER_ID)) return
-      map.setFilter(LISTINGS_LAYER_ID, typeFilter === 'all' ? null : ['==', ['get', 'type'], typeFilter])
+
+      const conditions = []
+      if (typeFilter !== 'all') {
+        conditions.push(['==', ['get', 'type'], typeFilter])
+      }
+      if (categoryFilter.length < ALL_CATEGORIES.length) {
+        conditions.push(['in', ['get', 'category'], ['literal', categoryFilter]])
+      }
+
+      const filter = conditions.length === 0 ? null : conditions.length === 1 ? conditions[0] : ['all', ...conditions]
+      map.setFilter(LISTINGS_LAYER_ID, filter)
     }
 
     if (map.isStyleLoaded()) {
@@ -221,7 +239,7 @@ export function MapView({ onMapClick, pendingPins, refreshToken, typeFilter = 'a
     } else {
       map.once('load', applyFilter)
     }
-  }, [typeFilter])
+  }, [typeFilter, categoryFilter])
 
   return <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
 }
