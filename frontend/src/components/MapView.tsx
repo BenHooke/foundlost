@@ -56,6 +56,7 @@ export function MapView({
       map.addSource(LISTINGS_SOURCE_ID, {
         type: 'geojson',
         data: { type: 'FeatureCollection', features: [] },
+        promoteId: 'id',
       })
 
       map.addLayer({
@@ -63,7 +64,14 @@ export function MapView({
         type: 'circle',
         source: LISTINGS_SOURCE_ID,
         paint: {
-          'circle-radius': 8,
+          'circle-radius': [
+            'case',
+            ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'open'], false]],
+            11,
+            8,
+          ],
+          'circle-radius-transition': { duration: 150 },
+          'circle-stroke-width-transition': { duration: 150 },
           'circle-color': [
             'match',
             ['get', 'category'],
@@ -85,7 +93,12 @@ export function MapView({
             CATEGORY_COLORS.electronics,
             CATEGORY_COLORS.other,
           ],
-          'circle-stroke-width': 2,
+          'circle-stroke-width': [
+            'case',
+            ['any', ['boolean', ['feature-state', 'hover'], false], ['boolean', ['feature-state', 'open'], false]],
+            3,
+            2,
+          ],
           'circle-stroke-color': ['match', ['get', 'type'], 'found', '#000000', '#ffffff'],
         },
       })
@@ -97,7 +110,12 @@ export function MapView({
       })
 
       let openClickPopup: maplibregl.Popup | null = null
-      let openClickPopupId: string | null = null
+      let openFeatureId: string | null = null
+      let hoveredFeatureId: string | null = null
+
+      const setFeatureFlag = (id: string, key: 'hover' | 'open', value: boolean) => {
+        map.setFeatureState({ source: LISTINGS_SOURCE_ID, id }, { [key]: value })
+      }
 
       map.on('mouseenter', 'listings-markers', (e) => {
         map.getCanvas().style.cursor = 'pointer'
@@ -105,7 +123,13 @@ export function MapView({
         if (!feature || feature.geometry.type !== 'Point') return
 
         const { id, name } = feature.properties as ListingProperties
-        if (id === openClickPopupId) return
+        if (hoveredFeatureId && hoveredFeatureId !== id) {
+          setFeatureFlag(hoveredFeatureId, 'hover', false)
+        }
+        hoveredFeatureId = id
+        setFeatureFlag(id, 'hover', true)
+
+        if (id === openFeatureId) return
 
         const coordinates = feature.geometry.coordinates.slice() as [number, number]
         hoverPopup.setLngLat(coordinates).setText(name).addTo(map)
@@ -114,6 +138,10 @@ export function MapView({
       map.on('mouseleave', 'listings-markers', () => {
         map.getCanvas().style.cursor = ''
         hoverPopup.remove()
+        if (hoveredFeatureId) {
+          setFeatureFlag(hoveredFeatureId, 'hover', false)
+          hoveredFeatureId = null
+        }
       })
 
       map.on('click', 'listings-markers', (e) => {
@@ -149,11 +177,15 @@ export function MapView({
         const popup = new maplibregl.Popup({ offset: 12 }).setLngLat(coordinates).setDOMContent(container).addTo(map)
 
         popup.on('close', () => {
-          if (openClickPopupId === id) openClickPopupId = null
+          if (openFeatureId === id) {
+            setFeatureFlag(id, 'open', false)
+            openFeatureId = null
+          }
         })
 
         openClickPopup = popup
-        openClickPopupId = id
+        openFeatureId = id
+        setFeatureFlag(id, 'open', true)
       })
 
       fetchListings()
