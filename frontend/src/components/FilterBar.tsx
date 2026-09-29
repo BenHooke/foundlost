@@ -25,6 +25,7 @@ export function FilterBar({ value, onChange }: FilterBarProps) {
         gap: 4,
         background: 'rgba(255, 255, 255, 0.92)',
         borderRadius: 999,
+        border: '2px solid #000000',
         padding: 4,
         boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
         fontFamily: 'system-ui, sans-serif',

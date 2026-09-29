@@ -47,7 +47,7 @@ function App() {
         />
         <FilterBar value={typeFilter} onChange={setTypeFilter} />
         <div style={{ position: 'absolute', left: 12, bottom: 12, display: 'flex', alignItems: 'flex-end', gap: 12 }}>
-          <Legend />
+          <Legend selectedCategories={categoryFilter} />
           <CategoryFilter value={categoryFilter} onChange={setCategoryFilter} />
         </div>
         <ReportFab

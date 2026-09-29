@@ -10,6 +10,7 @@ export function Header() {
         padding: '0 16px',
         fontFamily: 'system-ui, sans-serif',
         flexShrink: 0,
+        borderBottom: '3px solid #000000',
       }}
     >
       <span style={{ fontSize: 20, fontWeight: 700 }}>FoundLost</span>

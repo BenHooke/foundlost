@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { useClickOutside } from '../hooks/useClickOutside'
 import type { ListingType } from '../types/listing'
 
 interface ReportFabProps {
@@ -8,6 +9,9 @@ interface ReportFabProps {
 
 export function ReportFab({ onSelectPostType, disabled }: ReportFabProps) {
   const [menuOpen, setMenuOpen] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useClickOutside(containerRef, () => setMenuOpen(false), menuOpen)
 
   const choose = (type: ListingType) => {
     setMenuOpen(false)
@@ -15,7 +19,10 @@ export function ReportFab({ onSelectPostType, disabled }: ReportFabProps) {
   }
 
   return (
-    <div style={{ position: 'absolute', right: 24, bottom: 48, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 12 }}>
+    <div
+      ref={containerRef}
+      style={{ position: 'absolute', right: 24, bottom: 48, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 12 }}
+    >
       {menuOpen && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <button
