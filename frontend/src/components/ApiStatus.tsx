@@ -19,7 +19,7 @@ export function ApiStatus() {
     <div
       style={{
         position: 'absolute',
-        top: 12,
+        top: 68,
         left: 12,
         zIndex: 1,
         background: 'white',

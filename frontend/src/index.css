@@ -13,3 +13,8 @@ body {
 .maplibregl-user-location-dot::after {
   display: none !important;
 }
+
+/* Clear the navbar, which now overlays the full-bleed map. */
+.maplibregl-ctrl-top-right {
+  top: 64px !important;
+}

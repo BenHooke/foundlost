@@ -34,9 +34,8 @@ function App() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', width: '100vw', height: '100vh' }}>
-      <Header />
-      <div style={{ position: 'relative', flex: 1, minHeight: 0 }}>
+    <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
+      <div style={{ position: 'absolute', inset: 0 }}>
         <ApiStatus />
         <MapView
           onMapClick={handleMapClick}
@@ -70,6 +69,7 @@ function App() {
           />
         )}
       </div>
+      <Header />
     </div>
   )
 }

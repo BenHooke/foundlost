@@ -18,7 +18,7 @@ export function FilterBar({ value, onChange }: FilterBarProps) {
     <div
       style={{
         position: 'absolute',
-        top: 16,
+        top: 72,
         left: '50%',
         transform: 'translateX(-50%)',
         display: 'flex',
